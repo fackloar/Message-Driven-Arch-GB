@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderApp.Classes
+namespace Restaraunt.Booking.Classes
 {
     /// <summary>
     /// Класс для сущности "Ресторан"
     /// </summary>
-    internal class Restaraunt
+    internal class RestarauntClass
     {
         private readonly List<Table> _tables = new();
         private readonly AutoResetEvent _autoResetEvent = new(true);
 
-        public Restaraunt()
+        public RestarauntClass()
         {
             for (ushort i = 1; i <= 10; i++)
             {
@@ -84,7 +84,7 @@ namespace OrderApp.Classes
         public bool CheckIfBooked(int tableId)
         {
             var table = _tables.Find(t => t.Id == tableId);
-            return (table.State == State.Booked);
+            return table.State == State.Booked;
         }
         /// <summary>
         /// метод для повторяющейся отмены брони после определенного времени

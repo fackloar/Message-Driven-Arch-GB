@@ -4,21 +4,24 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Messaging;
 
-namespace OrderApp.Classes
+namespace Restaraunt.Booking.Classes
 {
     /// <summary>
     /// класс для взаимодействия с пользователем
     /// </summary>
     internal class SpeakerBot
     {
-        private readonly Restaraunt _restaraunt;
+        private readonly RestarauntClass _restaraunt;
         private readonly TimeSpan interval = TimeSpan.FromMinutes(1);
         private const string _firstChoice = "1";
         private const string _secondChoice = "2";
-        public SpeakerBot(Restaraunt restaraunt)
+        private readonly Producer _producer;
+        public SpeakerBot(RestarauntClass restaraunt)
         {
             _restaraunt = restaraunt;
+            _producer = new Producer();
 
             CancelBookingTimer(interval);
         }
@@ -73,7 +76,7 @@ namespace OrderApp.Classes
                         Console.WriteLine(SpeakerBotLines.WaitForBooking);
                         Console.WriteLine(SpeakerBotLines.StayOnLine);
                         table = _restaraunt.BookFreeTable(1);
-                        Console.WriteLine(table is null
+                        _producer.Send(table is null
                             ? SpeakerBotLines.AllTablesOccupied
                             : SpeakerBotLines.BookingReady + table.Id);
                         break;
@@ -113,14 +116,14 @@ namespace OrderApp.Classes
             while (!validInput)
             {
                 Console.WriteLine(SpeakerBotLines.WaitForCancellation);
-                if (!int.TryParse(Console.ReadLine(), out var tableId) || (tableId < 0 || tableId > 10))
+                if (!int.TryParse(Console.ReadLine(), out var tableId) || tableId < 0 || tableId > 10)
                 {
                     Console.WriteLine(SpeakerBotLines.InputTableId);
                 }
                 else if (!_restaraunt.CheckIfBooked(tableId))
                 {
                     validInput = true;
-                    Console.WriteLine(tableId + SpeakerBotLines.TableNotOccupied);
+                    _producer.Send(tableId + SpeakerBotLines.TableNotOccupied);
                 }
                 else
                 {
@@ -138,21 +141,21 @@ namespace OrderApp.Classes
             while (!validInput)
             {
                 Console.WriteLine(SpeakerBotLines.WaitForCancellation);
-                if (!int.TryParse(Console.ReadLine(), out var tableId) || (tableId < 0 || tableId > 10))
+                if (!int.TryParse(Console.ReadLine(), out var tableId) || tableId < 0 || tableId > 10)
                 {
                     Console.WriteLine(SpeakerBotLines.InputTableId);
                 }
                 else if (!_restaraunt.CheckIfBooked(tableId))
                 {
                     validInput = true;
-                    Console.WriteLine(tableId + SpeakerBotLines.TableNotOccupied);
+                    _producer.Send(tableId + SpeakerBotLines.TableNotOccupied);
                 }
                 else
                 {
                     validInput = true;
                     Console.WriteLine(SpeakerBotLines.StayOnLine);
                     var table = _restaraunt.CancelBooking(tableId);
-                    Console.WriteLine(SpeakerBotLines.CancellationReady + table.Id);
+                    _producer.Send(SpeakerBotLines.CancellationReady + table.Id);
                 }
             }
         }
@@ -162,7 +165,7 @@ namespace OrderApp.Classes
             await Task.Run(async () =>
             {
                 await Task.Delay(1000);
-                Console.WriteLine(table is null
+                _producer.Send(table is null
                     ? SpeakerBotLines.Notification + SpeakerBotLines.AllTablesOccupied
                     : SpeakerBotLines.Notification + SpeakerBotLines.BookingReady + table.Id);
             });
@@ -172,7 +175,7 @@ namespace OrderApp.Classes
             await Task.Run(async () =>
             {
                 await Task.Delay(1000);
-                Console.WriteLine(SpeakerBotLines.Notification + SpeakerBotLines.CancellationReady + table.Id);
+                _producer.Send(SpeakerBotLines.Notification + SpeakerBotLines.CancellationReady + table.Id);
             });
         }
         /// <summary>
@@ -189,7 +192,7 @@ namespace OrderApp.Classes
                 var cancelledTable = _restaraunt.CancelBookingTimed();
                 if (cancelledTable is not null)
                 {
-                    Console.WriteLine(SpeakerBotLines.AutoCancellation + cancelledTable.Id);
+                    _producer.Send(SpeakerBotLines.AutoCancellation + cancelledTable.Id);
                 }
                 await delayTask;
             }

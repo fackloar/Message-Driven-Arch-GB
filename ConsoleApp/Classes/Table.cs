@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrderApp.Classes
+namespace Restaraunt.Booking.Classes
 
 {
     /// <summary>
@@ -16,7 +16,7 @@ namespace OrderApp.Classes
         public int SeatsCount { get; }
         public int Id { get; }
 
-        public Table (int id)
+        public Table(int id)
         {
             Id = id;
             State = State.Free;
