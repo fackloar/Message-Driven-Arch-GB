@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp.Models
+namespace OrderApp.Classes
 {
     /// <summary>
     /// фразы, которые использует SpeakerBot. Вынесенны в отдельный класс, чтобы удобнее было редактировать, не залезая в основную логику программы. 

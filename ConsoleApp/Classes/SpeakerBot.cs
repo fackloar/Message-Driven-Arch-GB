@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp.Models
+namespace OrderApp.Classes
 {
     /// <summary>
     /// класс для взаимодействия с пользователем
@@ -14,6 +14,8 @@ namespace ConsoleApp.Models
     {
         private readonly Restaraunt _restaraunt;
         private readonly TimeSpan interval = TimeSpan.FromMinutes(1);
+        private const string _firstChoice = "1";
+        private const string _secondChoice = "2";
         public SpeakerBot(Restaraunt restaraunt)
         {
             _restaraunt = restaraunt;
@@ -28,24 +30,23 @@ namespace ConsoleApp.Models
             while (true)
             {
                 Console.WriteLine(SpeakerBotLines.InitialHelloChoice);
-            initialInput:
-                if (!int.TryParse(Console.ReadLine(), out var choice) && choice is not (1 or 2))
-                {
-                    Console.WriteLine(SpeakerBotLines.Input1Or2);
-                    goto initialInput;
-                }
 
                 var stopWatch = new Stopwatch();
                 stopWatch.Start();
 
-                if (choice == 1)
+                switch (Console.ReadLine())
                 {
-                    ChooseTypeOfBooking();
+                    case _firstChoice:
+                        ChooseTypeOfBooking();
+                        break;
+                    case _secondChoice:
+                        ChooseTypeOfCancellation();
+                        break;
+                    default:
+                        Console.WriteLine(SpeakerBotLines.Input1Or2);
+                        break;
                 }
-                else
-                {
-                    ChooseTypeOfCancellation();
-                }
+
                 stopWatch.Stop();
                 var ts = stopWatch.Elapsed;
                 Console.WriteLine($"{ts.Seconds:00}:{ts.Milliseconds:00}");
@@ -55,72 +56,100 @@ namespace ConsoleApp.Models
         private async void ChooseTypeOfBooking()
         {
             Console.WriteLine(SpeakerBotLines.BookingChoice);
-        input:
-            if (!int.TryParse(Console.ReadLine(), out var choiceOfBooking) && choiceOfBooking is not (1 or 2))
+            bool validInput = false;
+            while (!validInput)
             {
-                Console.WriteLine(SpeakerBotLines.Input1Or2);
-                goto input;
-            }
-            Console.WriteLine(SpeakerBotLines.WaitForBooking);
-            if (choiceOfBooking == 1)
-            {
-                Console.WriteLine(SpeakerBotLines.YoullBeNotified);
-                var table = await _restaraunt.BookFreeTableAsync(1);
-                NotifyOnBooking(table);
-            }
-            else
-            {
-                Console.WriteLine(SpeakerBotLines.StayOnLine);
-                var table = _restaraunt.BookFreeTable(1);
-                Console.WriteLine(table is null
-                    ? SpeakerBotLines.AllTablesOccupied
-                    : SpeakerBotLines.BookingReady + table.Id);
+                switch (Console.ReadLine())
+                {
+                    case _firstChoice:
+                        validInput = true;
+                        Console.WriteLine(SpeakerBotLines.WaitForBooking);
+                        Console.WriteLine(SpeakerBotLines.YoullBeNotified);
+                        var table = await _restaraunt.BookFreeTableAsync(1);
+                        NotifyOnBooking(table);
+                        break;
+                    case _secondChoice:
+                        validInput = true;
+                        Console.WriteLine(SpeakerBotLines.WaitForBooking);
+                        Console.WriteLine(SpeakerBotLines.StayOnLine);
+                        table = _restaraunt.BookFreeTable(1);
+                        Console.WriteLine(table is null
+                            ? SpeakerBotLines.AllTablesOccupied
+                            : SpeakerBotLines.BookingReady + table.Id);
+                        break;
+                    default:
+                        Console.WriteLine(SpeakerBotLines.Input1Or2);
+                        break;
+                }
             }
         }
 
         private async void ChooseTypeOfCancellation()
         {
             Console.WriteLine(SpeakerBotLines.CancellationChoice);
-        input:
-            if (!int.TryParse(Console.ReadLine(), out var choiceOfCancellation) && choiceOfCancellation is not (1 or 2))
+            bool validInput = false;
+            while (!validInput)
             {
-                Console.WriteLine(SpeakerBotLines.Input1Or2);
-                goto input;
+                switch (Console.ReadLine())
+                {
+                    case _firstChoice:
+                        validInput = true;
+                        CancelAsync();
+                        break;
+                    case _secondChoice:
+                        validInput = true;
+                        Cancel();
+                        break;
+                    default:
+                        Console.WriteLine(SpeakerBotLines.Input1Or2);
+                        break;
+                }
             }
-            Console.WriteLine(SpeakerBotLines.WaitForCancellation);
-            if (choiceOfCancellation == 1)
+        }
+
+        private async void CancelAsync()
+        {
+            bool validInput = false;
+            while (!validInput)
             {
-            inputTableId1:
+                Console.WriteLine(SpeakerBotLines.WaitForCancellation);
                 if (!int.TryParse(Console.ReadLine(), out var tableId) || (tableId < 0 || tableId > 10))
                 {
                     Console.WriteLine(SpeakerBotLines.InputTableId);
-                    goto inputTableId1;
                 }
-                if (!_restaraunt.CheckIfBooked(tableId))
+                else if (!_restaraunt.CheckIfBooked(tableId))
                 {
+                    validInput = true;
                     Console.WriteLine(tableId + SpeakerBotLines.TableNotOccupied);
                 }
                 else
                 {
+                    validInput = true;
                     Console.WriteLine(SpeakerBotLines.YoullBeNotified);
                     var table = await _restaraunt.CancelBookingAsync(tableId);
                     NotifyOnCancellation(table);
                 }
             }
-            else
+        }
+
+        private void Cancel()
+        {
+            bool validInput = false;
+            while (!validInput)
             {
-            inputTableId2:
+                Console.WriteLine(SpeakerBotLines.WaitForCancellation);
                 if (!int.TryParse(Console.ReadLine(), out var tableId) || (tableId < 0 || tableId > 10))
                 {
                     Console.WriteLine(SpeakerBotLines.InputTableId);
-                    goto inputTableId2;
                 }
-                if (!_restaraunt.CheckIfBooked(tableId))
+                else if (!_restaraunt.CheckIfBooked(tableId))
                 {
+                    validInput = true;
                     Console.WriteLine(tableId + SpeakerBotLines.TableNotOccupied);
                 }
                 else
                 {
+                    validInput = true;
                     Console.WriteLine(SpeakerBotLines.StayOnLine);
                     var table = _restaraunt.CancelBooking(tableId);
                     Console.WriteLine(SpeakerBotLines.CancellationReady + table.Id);

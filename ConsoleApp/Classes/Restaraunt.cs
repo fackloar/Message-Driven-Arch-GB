@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleApp.Models
+namespace OrderApp.Classes
 {
     /// <summary>
     /// Класс для сущности "Ресторан"
@@ -84,14 +84,7 @@ namespace ConsoleApp.Models
         public bool CheckIfBooked(int tableId)
         {
             var table = _tables.Find(t => t.Id == tableId);
-            if (table.State == State.Booked)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (table.State == State.Booked);
         }
         /// <summary>
         /// метод для повторяющейся отмены брони после определенного времени
