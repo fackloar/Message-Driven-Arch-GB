@@ -38,20 +38,18 @@ namespace Messaging
             {
                 try
                 {
-                    using IConnection connection = _connectionFactory.CreateConnection();
-                    using (StreamReader reader = new StreamReader(new MemoryStream(data)))
-                    {
-                        using (var channel = connection.CreateModel())
-                        {
-                            channel.BasicPublish(exchange: "",
-                                routingKey: queueName,
-                                body: data);
-                            channel.Close();
-                        }
-                        Console.WriteLine($"Сообщение отправлено в очередь {queueName}");
-                        reader.Close();
-                        connection.Close();
-                    }
+                    using var connection = _connectionFactory.CreateConnection();
+                    using var channel = connection.CreateModel();
+
+                    channel.ExchangeDeclare(
+                        exchange: "direct_exchange",
+                        type: "direct",
+                        durable: true);
+
+                    channel.BasicPublish(
+                        exchange: "direct_exchange",
+                        routingKey: "black",
+                        body: data);
                 }
                 catch (Exception e)
                 {

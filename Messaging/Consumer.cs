@@ -14,6 +14,7 @@ namespace Messaging
         private readonly ConnectionFactory _connectionFactory;
         private readonly IModel _channel;
         private readonly string _queueName;
+        private readonly Dictionary<string, object> _arguments;
 
         public Consumer(string queueName)
         {
@@ -36,10 +37,30 @@ namespace Messaging
 
             _channel = _connectionFactory.CreateConnection().CreateModel();
             _queueName = queueName;
+            _arguments = new Dictionary<string, object>();
+            _arguments.Add("rvapidqy-max-length", 10000);
         }
 
         public void Receive(EventHandler<BasicDeliverEventArgs> receiveCallback)
         {
+            _channel.ExchangeDeclare(
+                exchange: "direct_exchange",
+                type: "direct",
+                durable: true);
+
+            _channel.QueueDeclare(
+                queue: _queueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: _arguments);
+
+            _channel.QueueBind(
+                queue: _queueName,
+                exchange: "direct_exchange",
+                routingKey: "black");
+
+            
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += receiveCallback;
 
