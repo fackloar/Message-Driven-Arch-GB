@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Restaraunt.Notification;
 using Restaurant.Notification.Consumers;
 

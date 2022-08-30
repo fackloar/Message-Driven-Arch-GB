@@ -1,4 +1,4 @@
-﻿using MassTransit;
+using MassTransit;
 using Restaraunt.Booking.Classes;
 using System.Diagnostics;
 
