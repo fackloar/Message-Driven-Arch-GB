@@ -18,6 +18,7 @@ namespace Restaraunt.Notification
 
         private void Notify(Guid orderId)
         {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             var booking = _state[orderId];
 
             switch (booking.Item2)

@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Restaraunt.Messages\Restaraunt.Messages.csproj" />
     <ProjectReference Include="..\Restaraunt.Notification\Restaraunt.Notification.csproj" />
   </ItemGroup>
 

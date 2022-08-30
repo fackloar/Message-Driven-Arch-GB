@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Restaraunt.Booking": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:51278;http://localhost:51280"
+    }
+  }
+}

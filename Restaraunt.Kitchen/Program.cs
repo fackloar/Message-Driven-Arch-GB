@@ -11,6 +11,16 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
+        cfg.Host("sparrow.rmq.cloudamqp.com", 5671, "rvapidqy", h =>
+        {
+            h.Username("rvapidqy");
+            h.Password("x1XJkf1mQU1iqkfCEfs1J7DeXhblPQkz");
+
+            h.UseSsl(s =>
+            {
+                s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
+            });
+        });
         cfg.ConfigureEndpoints(context);
     });
 });

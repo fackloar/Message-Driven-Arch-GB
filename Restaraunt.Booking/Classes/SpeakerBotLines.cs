@@ -19,6 +19,7 @@ namespace Restaraunt.Booking.Classes
         public static readonly string AllTablesOccupied = "К сожалению, сейчас все столики заняты";
         public static readonly string BookingReady = "Готово! Забронировали столик под номером ";
         public static readonly string CancellationReady = "Готово! Отменили бронь столика под номером ";
+        public static readonly string InitialHello = "Привет! Сейчас забронируем столик!";
         public static readonly string InitialHelloChoice = "Привет! Желаете забронировать столик или отменить бронь?" +
                                                             "\n1 - забронировать" +
                                                             "\n2 - отменить бронь";
@@ -33,6 +34,7 @@ namespace Restaraunt.Booking.Classes
         public static readonly string TableDoesntExist = "У нас нет столика с таким номером";
         public static readonly string TableNotOccupied = " столик не занят";
         public static readonly string AutoCancellation = "Была автоматически отменена бронь столика под номером ";
+        public static readonly string AskForNumberOfGuests = "На сколько людей забронировать столик?";
 
 
     }
