@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,13 +15,14 @@ namespace Restaraunt.Booking.Classes
         public State State { get; private set; }
         public int SeatsCount { get; }
         public int Id { get; }
+        private readonly object _lock = new object();
+        private static readonly Random Random = new();
 
         public Table(int id)
         {
             Id = id;
             State = State.Free;
-            Random rand = new Random();
-            SeatsCount = rand.Next(2, 5);
+            SeatsCount = Random.Next(2, 5);
         }
         /// <summary>
         /// Назначение состояния
@@ -30,13 +31,16 @@ namespace Restaraunt.Booking.Classes
         /// <returns></returns>
         public bool SetState(State state)
         {
-            if (state == State)
+            lock (_lock)
             {
-                return false;
-            }
+                if (state == State)
+                {
+                    return false;
+                }
 
-            State = state;
-            return true;
+                State = state;
+                return true;
+            }
         }
     }
 }

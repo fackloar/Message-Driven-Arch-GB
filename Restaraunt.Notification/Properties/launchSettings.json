@@ -2,11 +2,11 @@
   "profiles": {
     "Restaraunt.Notification": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:49597;http://localhost:49598"
+      "applicationUrl": "https://localhost:51277;http://localhost:51279"
     }
   }
 }
