@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Restaraunt.Messages;
+using Restaraunt.Messages.Interfaces;
 
 namespace Restaraunt.Booking.Classes
 {
@@ -23,11 +24,12 @@ namespace Restaraunt.Booking.Classes
             {
                 await Task.Delay(10000, stoppingToken);
 
-                Console.WriteLine(SpeakerBotLines.AskForNumberOfGuests);
-                ushort numberOfGuests = ushort.Parse(Console.ReadLine());
-                var result = await _restaraunt.BookFreeTableAsync(numberOfGuests);
-                await _bus.Publish(new TableBooked(NewId.NextGuid(), NewId.NextGuid(), result ?? false),
-                        context => context.Durable = false, stoppingToken);
+                Console.WriteLine("Привет! Желаете забронировать столик?");
+
+                var dateTime = DateTime.Now;
+                await _bus.Publish(
+                    (IBookingRequest)new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), null, dateTime),
+                    stoppingToken);
             }
         }
 
