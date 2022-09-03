@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Restaraunt.Messages.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,13 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Messages
 {
-    internal class BookingCancellation
+    internal class BookingCancellation : IBookingCancellation
     {
+        public BookingCancellation(Guid orderId)
+        {
+            OrderId = orderId;
+        }
+
+        public Guid OrderId { get; }
     }
 }

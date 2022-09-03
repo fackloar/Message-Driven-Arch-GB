@@ -7,7 +7,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<KitchenTableBookedConsumer>();
+    x.AddConsumer<KitchenBookingRequestedConsumer>(
+                            configurator =>
+                            {
+                            })
+                            .Endpoint(e =>
+                            {
+                                e.Temporary = true;
+                            }); ;
+    x.AddConsumer<KitchenBookingRequestFaultConsumer>()
+    .Endpoint(e =>
+    {
+        e.Temporary = true;
+    });
+    x.AddDelayedMessageScheduler();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -21,6 +34,8 @@ builder.Services.AddMassTransit(x =>
                 s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
             });
         });
+        cfg.UseDelayedMessageScheduler();
+        cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
     });
 });

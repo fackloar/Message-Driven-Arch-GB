@@ -8,5 +8,6 @@ namespace Restaraunt.Messages.Interfaces
 {
     internal interface IBookingCancellation
     {
+        public Guid OrderId { get; }
     }
 }

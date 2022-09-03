@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Messages.Interfaces
 {
-    internal class IBookingRequest
+    public class IBookingRequest
     {
+        public Guid OrderId { get; }
+
+        public Guid ClientId { get; }
+
+        public Dish? PreOrder { get; }
+
+        public DateTime CreationDate { get; }
     }
 }

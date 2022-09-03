@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Messages.Interfaces
 {
-    internal interface INotify
+    public interface INotify
     {
+        public Guid OrderId { get; }
+
+        public Guid ClientId { get; }
+
+        public string Message { get; }
     }
 }
