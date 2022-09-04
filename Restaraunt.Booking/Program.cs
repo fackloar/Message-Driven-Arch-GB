@@ -1,5 +1,6 @@
 using MassTransit;
 using Restaraunt.Booking.Classes;
+using Restaraunt.Booking.Consumers;
 using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,25 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<BookingRequestConsumer>()
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        });
+
+    x.AddConsumer<BookingRequestFaultConsumer>()
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        });
+
+    x.AddSagaStateMachine<RestarauntBookingSaga, RestarauntBooking>()
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        })
+        .InMemoryRepository();
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("sparrow.rmq.cloudamqp.com", 5671, "rvapidqy", h =>
@@ -19,11 +39,15 @@ builder.Services.AddMassTransit(x =>
                 s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
             });
         });
-
+        cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
     });
 });
+
+builder.Services.AddTransient<RestarauntBooking>();
+builder.Services.AddTransient<RestarauntBookingSaga>();
 builder.Services.AddTransient<RestarauntClass>();
+
 builder.Services.AddHostedService<BookingWorker>();
 
 var app = builder.Build();

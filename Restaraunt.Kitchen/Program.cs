@@ -20,7 +20,6 @@ builder.Services.AddMassTransit(x =>
     {
         e.Temporary = true;
     });
-    x.AddDelayedMessageScheduler();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -34,7 +33,6 @@ builder.Services.AddMassTransit(x =>
                 s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
             });
         });
-        cfg.UseDelayedMessageScheduler();
         cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
     });

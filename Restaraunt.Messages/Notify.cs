@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Messages
 {
-    internal class Notify : INotify
+    public class Notify : INotify
     {
         public Notify(Guid orderId, Guid clientId, string message)
         {

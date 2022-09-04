@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Messages
 {
-    internal class BookingCancellation : IBookingCancellation
+    public class BookingCancellation : IBookingCancellation
     {
         public BookingCancellation(Guid orderId)
         {

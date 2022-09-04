@@ -1,11 +1,14 @@
 ﻿using MassTransit;
+using Restaraunt.Booking.Consumers;
+using Restaraunt.Messages;
 using Restaraunt.Messages.Interfaces;
+using Automatonymous;
 
 namespace Restaraunt.Booking.Classes
 {
     public class RestarauntBookingSaga : MassTransitStateMachine<RestarauntBooking>
     {
-        public RestaurantBookingSaga()
+        public RestarauntBookingSaga()
         {
             InstanceState(x => x.CurrentState);
 
@@ -48,10 +51,10 @@ namespace Restaraunt.Booking.Classes
                     .Schedule(BookingExpired,
                         context => new BookingExpire(context.Instance),
                         context => TimeSpan.FromSeconds(1))
-                    .TransitionTo(AwaitingBookingApproved)
+                    .TransitionTo(State(AwaitingBookingApproved.ToString()))
             );
 
-            During(AwaitingBookingApproved,
+            During(State(AwaitingBookingApproved.ToString()),
                 When(BookingApproved)
                     .Unschedule(BookingExpired)
                     .Publish(context =>
@@ -83,7 +86,7 @@ namespace Restaraunt.Booking.Classes
 
         public Event<Fault<IBookingRequest>> BookingRequestFault { get; private set; }
 
-        public Schedule<RestaurantBooking, IBookingExpire> BookingExpired { get; private set; }
+        public Schedule<RestarauntBooking, IBookingExpire> BookingExpired { get; private set; }
         public Event BookingApproved { get; private set; }
     }
 }
