@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +32,6 @@ namespace Restaraunt.Booking.Classes
         {
             _autoResetEvent.WaitOne();
             var table = _tables.FirstOrDefault(t => t.SeatsCount > countOfGuests && t.State == State.Free);
-            await Task.Delay(1000 * 5);
             _autoResetEvent.Set();
             return table?.SetState(State.Booked);
         }
