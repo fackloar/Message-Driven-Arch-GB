@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.Initializers.TypeConverters;
 
 namespace Restaraunt.Booking.Classes
 {
@@ -21,5 +22,7 @@ namespace Restaraunt.Booking.Classes
 
         // пометка о том, что наша заявка просрочена
         public Guid? ExpirationId { get; set; }
+
+        public int TimeOfArrival { get; set; }
     }
 }

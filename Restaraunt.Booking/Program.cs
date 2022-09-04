@@ -27,6 +27,8 @@ builder.Services.AddMassTransit(x =>
         })
         .InMemoryRepository();
 
+    x.AddDelayedMessageScheduler();
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host("sparrow.rmq.cloudamqp.com", 5671, "rvapidqy", h =>
@@ -39,6 +41,7 @@ builder.Services.AddMassTransit(x =>
                 s.Protocol = System.Security.Authentication.SslProtocols.Tls12;
             });
         });
+        cfg.UseDelayedMessageScheduler();
         cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
     });

@@ -26,9 +26,12 @@ namespace Restaraunt.Booking.Classes
 
                 Console.WriteLine("Привет! Желаете забронировать столик?");
 
+                var rand = new Random();
+                var estimatedTimeOfArrival = rand.Next(7, 15);
+
                 var dateTime = DateTime.Now;
                 await _bus.Publish(
-                    (IBookingRequest)new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), null, dateTime),
+                    (IBookingRequest)new BookingRequest(NewId.NextGuid(), NewId.NextGuid(), null, dateTime, estimatedTimeOfArrival),
                     stoppingToken);
             }
         }

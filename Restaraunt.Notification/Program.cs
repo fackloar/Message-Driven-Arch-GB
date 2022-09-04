@@ -36,6 +36,7 @@ builder.Services.AddMassTransit(x =>
             r.Ignore<ArgumentNullException>(x => x.Message.Contains("Consumer"));
         });
 
+        cfg.UseDelayedMessageScheduler();
         cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
     });

@@ -15,5 +15,7 @@ namespace Restaraunt.Messages.Interfaces
         public Dish? PreOrder { get; }
 
         public DateTime CreationDate { get; }
+        public int EstimatedTimeOfArrival { get; }
+
     }
 }
