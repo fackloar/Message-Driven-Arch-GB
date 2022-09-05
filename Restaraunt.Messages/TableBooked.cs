@@ -5,13 +5,13 @@ namespace Restaraunt.Messages
     public class TableBooked : ITableBooked
     {
         public Guid OrderId { get; }
-        public bool Success { get; }
+        public int TableId { get; }
         public DateTime CreationDate { get; }
         
-        public TableBooked(Guid orderId, bool success)
+        public TableBooked(Guid orderId, int tableId)
         {
             OrderId = orderId;
-            Success = success;
+            TableId = tableId;
         }
 
     }

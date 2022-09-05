@@ -9,7 +9,7 @@ namespace Restaraunt.Messages.Interfaces
     public interface ITableBooked
     {
         public Guid OrderId { get; }
-        public bool Success { get; }
         public DateTime CreationDate { get; }
+        public int TableId { get; }
     }
 }

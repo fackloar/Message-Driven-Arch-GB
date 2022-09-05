@@ -15,6 +15,10 @@ namespace Restaraunt.Kitchen
 
         public bool CheckKitchenReady(Guid orderId, Dish? dish)
         {
+            if (dish == Dish.Lasagna)
+            {
+                return false;
+            }
             return true;
         }
     }
