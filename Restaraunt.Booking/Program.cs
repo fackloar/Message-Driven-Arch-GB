@@ -8,13 +8,31 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<BookingRequestConsumer>()
+    x.AddConsumer<BookingRequestConsumer>(cfg =>
+    {
+        cfg.UseMessageRetry(r => r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+        cfg.UseScheduledRedelivery(r => r.Incremental(3, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10)));
+    })
         .Endpoint(e =>
         {
             e.Temporary = true;
         });
 
-    x.AddConsumer<BookingRequestFaultConsumer>()
+    x.AddConsumer<BookingRequestFaultConsumer>(cfg =>
+    {
+        cfg.UseMessageRetry(r => r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+        cfg.UseScheduledRedelivery(r => r.Incremental(3, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10)));
+    })
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        });
+
+    x.AddConsumer<BookingCancellationConsumer>(cfg =>
+    {
+        cfg.UseMessageRetry(r => r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+        cfg.UseScheduledRedelivery(r => r.Incremental(3, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10)));
+    })
         .Endpoint(e =>
         {
             e.Temporary = true;

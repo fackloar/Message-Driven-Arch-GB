@@ -7,19 +7,36 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<KitchenBookingRequestedConsumer>(
-                            configurator =>
-                            {
-                            })
-                            .Endpoint(e =>
-                            {
-                                e.Temporary = true;
-                            }); ;
-    x.AddConsumer<KitchenBookingRequestFaultConsumer>()
-    .Endpoint(e =>
+    x.AddConsumer<KitchenBookingRequestedConsumer>(cfg =>
     {
-        e.Temporary = true;
-    });
+        cfg.UseMessageRetry(r => r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+        cfg.UseScheduledRedelivery(r => r.Incremental(3, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10)));
+    })
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        });
+
+    x.AddConsumer<KitchenBookingRequestFaultConsumer>(cfg =>
+    {
+        cfg.UseMessageRetry(r => r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+        cfg.UseScheduledRedelivery(r => r.Incremental(3, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10)));
+    })
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        });
+
+    x.AddConsumer<KitchenBookingCancellationConsumer>(cfg =>
+    {
+        cfg.UseMessageRetry(r => r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+        cfg.UseScheduledRedelivery(r => r.Incremental(3, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10)));
+    })
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        });
+
     x.AddDelayedMessageScheduler();
 
     x.UsingRabbitMq((context, cfg) =>

@@ -24,5 +24,6 @@ namespace Restaraunt.Booking.Classes
         public Guid? ExpirationId { get; set; }
 
         public int TimeOfArrival { get; set; }
+        public int? TableId { get; set; }
     }
 }

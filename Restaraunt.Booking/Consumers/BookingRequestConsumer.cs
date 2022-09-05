@@ -17,9 +17,9 @@ namespace Restaraunt.Booking.Consumers
         public async Task Consume(ConsumeContext<IBookingRequest> context)
         {
             Console.WriteLine($"[OrderId: {context.Message.OrderId}]");
-            var result = await _restaurant.BookFreeTableAsync(1);
+            var (success, tableId) = await _restaurant.BookFreeTableAsync(1);
 
-            await context.Publish<ITableBooked>(new TableBooked(context.Message.OrderId, result ?? false));
+            await context.Publish<ITableBooked>(new TableBooked(context.Message.OrderId, tableId!.Value));
         }
     }
 }
