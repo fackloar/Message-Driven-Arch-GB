@@ -1,14 +1,21 @@
 using MassTransit;
 using Restaraunt.Notification;
-using Restaurant.Notification.Consumers;
+using Restaraunt.Notification.Consumers;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<NotifierTableBookedConsumer>();
-    x.AddConsumer<KitchenReadyConsumer>();
+    x.AddConsumer<NotifyConsumer>(cfg =>
+    {
+        cfg.UseMessageRetry(r => r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+        cfg.UseScheduledRedelivery(r => r.Incremental(3, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10)));
+    })
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        });
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -33,6 +40,8 @@ builder.Services.AddMassTransit(x =>
             r.Ignore<ArgumentNullException>(x => x.Message.Contains("Consumer"));
         });
 
+        cfg.UseDelayedMessageScheduler();
+        cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
     });
 });

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,13 +28,14 @@ namespace Restaraunt.Booking.Classes
         /// </summary>
         /// <param name="countOfGuests">количество гостей</param>
         /// <returns>забронированный стол</returns>
-        public async Task<bool?> BookFreeTableAsync(int countOfGuests)
+        public async Task<(bool, int?)> BookFreeTableAsync(int countOfGuests)
         {
             _autoResetEvent.WaitOne();
             var table = _tables.FirstOrDefault(t => t.SeatsCount > countOfGuests && t.State == State.Free);
-            await Task.Delay(1000 * 5);
             _autoResetEvent.Set();
-            return table?.SetState(State.Booked);
+            table?.SetState(State.Booked);
+
+            return (table is not null, table?.Id);
         }
         /// <summary>
         /// отменить бронь стола, синхронно

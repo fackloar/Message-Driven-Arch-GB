@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Messages.Interfaces
 {
-    public interface ITableBooked
+    public interface IRepository<T> where T : class
     {
-        public Guid OrderId { get; }
-        public DateTime CreationDate { get; }
-        public int TableId { get; }
+        void AddOrUpdate(T entity);
+        IEnumerable<T> Get();
     }
 }
