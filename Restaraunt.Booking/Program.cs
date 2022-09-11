@@ -1,6 +1,8 @@
 using MassTransit;
 using Restaraunt.Booking.Classes;
 using Restaraunt.Booking.Consumers;
+using Restaraunt.Messages.Interfaces;
+using Restaraunt.Messages;
 using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,12 +64,15 @@ builder.Services.AddMassTransit(x =>
         cfg.UseDelayedMessageScheduler();
         cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
+        cfg.Durable = false;
     });
 });
 
-builder.Services.AddTransient<RestarauntBooking>();
-builder.Services.AddTransient<RestarauntBookingSaga>();
-builder.Services.AddTransient<RestarauntClass>();
+builder.Services
+    .AddTransient<RestarauntBooking>()
+    .AddTransient<RestarauntBookingSaga>()
+    .AddTransient<RestarauntClass>()
+    .AddSingleton(typeof(IRepository<>), typeof(InMemoryRepository<>));
 
 builder.Services.AddHostedService<BookingWorker>();
 

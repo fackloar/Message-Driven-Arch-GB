@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Messages
 {
-    internal class InMemoryRepository<T> : IRepository<T> where T : class
+    public class InMemoryRepository<T> : IRepository<T> where T : class
     {
         private readonly ConcurrentBag<T> _repo = new();
 

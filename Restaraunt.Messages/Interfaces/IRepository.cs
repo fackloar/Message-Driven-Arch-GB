@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Messages.Interfaces
 {
-    internal interface IRepository<T> where T : class
+    public interface IRepository<T> where T : class
     {
         void AddOrUpdate(T entity);
         IEnumerable<T> Get();
