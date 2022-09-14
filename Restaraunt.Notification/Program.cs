@@ -1,9 +1,14 @@
 using MassTransit;
+using MassTransit.Audit;
+using Prometheus;
 using Restaraunt.Notification;
 using Restaraunt.Notification.Consumers;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+var serviceProvider = builder.Services.BuildServiceProvider();
+var auditStore = serviceProvider.GetService<IMessageAuditStore>();
 
 builder.Services.AddMassTransit(x =>
 {
@@ -43,10 +48,16 @@ builder.Services.AddMassTransit(x =>
         cfg.UseDelayedMessageScheduler();
         cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
+        cfg.ConnectSendAuditObservers(auditStore);
+        cfg.ConnectConsumeAuditObserver(auditStore);
+        cfg.UsePrometheusMetrics(serviceName: "restaurant_notification");
     });
 });
 
-builder.Services.AddSingleton<Notifier>();
+builder.Services
+    .AddSingleton<Notifier>();
 
 var app = builder.Build();
+
+app.MapMetrics();
 app.Run();

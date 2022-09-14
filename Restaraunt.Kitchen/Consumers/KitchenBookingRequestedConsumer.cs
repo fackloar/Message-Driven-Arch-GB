@@ -7,16 +7,18 @@ namespace Restaraunt.Kitchen.Consumers
     public class KitchenBookingRequestedConsumer : IConsumer<IBookingRequest>
     {
         private readonly Manager _manager;
+        private readonly ILogger<KitchenBookingRequestedConsumer> _logger;
 
-        public KitchenBookingRequestedConsumer(Manager manager)
+        public KitchenBookingRequestedConsumer(Manager manager, ILogger<KitchenBookingRequestedConsumer> logger)
         {
             _manager = manager;
+            _logger = logger;
         }
 
         public async Task Consume(ConsumeContext<IBookingRequest> context)
         {
-            Console.WriteLine($"[OrderId: {context.Message.OrderId} CreationDate: {context.Message.CreationDate}]");
-            Console.WriteLine("Trying time: " + DateTime.Now);
+            _logger.LogInformation($"[OrderId: {context.Message.OrderId} CreationDate: {context.Message.CreationDate}]");
+            _logger.LogInformation("Trying time: " + DateTime.Now);
 
             await Task.Delay(5000);
 

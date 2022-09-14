@@ -8,7 +8,8 @@ namespace Restaraunt.Booking.Classes
 {
     public class RestarauntBookingSaga : MassTransitStateMachine<RestarauntBooking>
     {
-        public RestarauntBookingSaga()
+        private readonly ILogger<RestarauntBookingSaga> _logger;
+        public RestarauntBookingSaga(ILogger<RestarauntBookingSaga> logger)
         {
             InstanceState(x => x.CurrentState);
 
@@ -54,7 +55,7 @@ namespace Restaraunt.Booking.Classes
                         context.Saga.ClientId = context.Message.ClientId;
                         context.Saga.TimeOfArrival = context.Message.EstimatedTimeOfArrival;
 
-                        Console.WriteLine("Saga: " + context.Message.CreationDate);
+                        _logger.LogInformation("Saga: " + context.Message.CreationDate);
                     })
                     .Schedule(BookingExpired,
                         context => new BookingExpire(context.Saga),
@@ -87,7 +88,7 @@ namespace Restaraunt.Booking.Classes
                     .Finalize(),
 
                 When(BookingExpired.Received)
-                    .Then(context => Console.WriteLine($"Отмена заказа {context.Saga.OrderId}"))
+                    .Then(context => _logger.LogWarning($"Отмена заказа {context.Saga.OrderId}"))
                     .Finalize()
             );
 
@@ -97,6 +98,7 @@ namespace Restaraunt.Booking.Classes
                     .Finalize());
 
             SetCompletedWhenFinalized();
+            _logger = logger;
         }
         public MassTransit.State AwaitingBookingApproved { get; private set; }
         public MassTransit.State AwaitingGuestArrival { get; private set; }

@@ -35,7 +35,7 @@ namespace Restaraunt.Booking.Classes
             _autoResetEvent.Set();
             table?.SetState(State.Booked);
 
-            return (table is not null, table?.Id);
+            return (table is not null, table?.Id)
         }
         /// <summary>
         /// отменить бронь стола, синхронно

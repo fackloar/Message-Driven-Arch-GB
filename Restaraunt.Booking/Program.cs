@@ -4,10 +4,15 @@ using Restaraunt.Booking.Consumers;
 using Restaraunt.Messages.Interfaces;
 using Restaraunt.Messages;
 using System.Diagnostics;
+using MassTransit.Audit;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var serviceProvider = builder.Services.BuildServiceProvider();
+var auditStore = serviceProvider.GetService<IMessageAuditStore>();
+
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<BookingRequestConsumer>(cfg =>
@@ -65,6 +70,9 @@ builder.Services.AddMassTransit(x =>
         cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
         cfg.Durable = false;
+        cfg.ConnectSendAuditObservers(auditStore);
+        cfg.ConnectConsumeAuditObserver(auditStore);
+        cfg.UsePrometheusMetrics(serviceName: "restaraunt_booking");
     });
 });
 
@@ -72,7 +80,8 @@ builder.Services
     .AddTransient<RestarauntBooking>()
     .AddTransient<RestarauntBookingSaga>()
     .AddTransient<RestarauntClass>()
-    .AddSingleton(typeof(IRepository<>), typeof(InMemoryRepository<>));
+    .AddSingleton(typeof(IRepository<>), typeof(InMemoryRepository<>))
+    .AddSingleton<IMessageAuditStore, LoggingAuditStore>();
 
 builder.Services.AddHostedService<BookingWorker>();
 
@@ -81,5 +90,5 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseHttpsRedirection();
-
+app.MapMetrics();
 app.Run();

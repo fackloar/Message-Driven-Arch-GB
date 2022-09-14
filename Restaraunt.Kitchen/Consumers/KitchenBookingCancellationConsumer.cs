@@ -5,9 +5,16 @@ namespace Restaraunt.Kitchen.Consumers
 {
     public class KitchenBookingCancellationConsumer : IConsumer<IBookingCancellation>
     {
+        private readonly ILogger<KitchenBookingCancellationConsumer> _logger;
+
+        public KitchenBookingCancellationConsumer(ILogger<KitchenBookingCancellationConsumer> logger)
+        {
+            _logger = logger;
+        }
+
         public Task Consume(ConsumeContext<IBookingCancellation> context)
         {
-            Console.WriteLine($"[OrderId] {context.Message.OrderId}] Отмена на кухне!");
+            _logger.LogWarning($"[OrderId] {context.Message.OrderId}] Отмена на кухне!");
             return context.ConsumeCompleted;
         }
     }
