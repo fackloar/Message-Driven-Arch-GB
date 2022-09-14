@@ -9,12 +9,14 @@ namespace Restaraunt.Booking.Consumers
     {
         private readonly RestarauntClass _restaraunt;
         private readonly IRepository<BookingCancellation> _repository;
+        ILogger<BookingCancellationConsumer> _logger;
 
-        public BookingCancellationConsumer(RestarauntClass restaraunt, IRepository<BookingCancellation> repository)
+        public BookingCancellationConsumer(RestarauntClass restaraunt, IRepository<BookingCancellation> repository, ILogger<BookingCancellationConsumer> logger)
         {
             _restaraunt = restaraunt;
             _repository = repository;
-        }   
+            _logger = logger;
+        }
 
         public async Task Consume(ConsumeContext<IBookingCancellation> context)
         {
@@ -27,19 +29,19 @@ namespace Restaraunt.Booking.Consumers
 
             if (model is not null && model.CheckMessageId(messageId))
             {
-                Console.WriteLine($"Отмена второй раз {messageId}");
+                _logger.LogDebug($"Отмена второй раз {messageId}");
                 return;
             }
 
             var requestModel = new BookingCancellation(context.Message, messageId);
 
-            Console.WriteLine($"Отмена первый раз {messageId}");
+            _logger.LogDebug($"Отмена первый раз {messageId}");
             var resultModel = model?.Update(requestModel, messageId) ?? requestModel;
 
             _repository.AddOrUpdate(resultModel);
 
             await _restaraunt.CancelBookingAsync(tableId);
-            Console.WriteLine($"[OrderId {context.Message.OrderId}] Отмена, столик {context.Message.TableId} освобожден.", context.Message.OrderId, tableId);
+            _logger.LogInformation($"[OrderId {context.Message.OrderId}] Отмена, столик {context.Message.TableId} освобожден.", context.Message.OrderId, tableId);
         }
     }
 }

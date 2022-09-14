@@ -1,10 +1,19 @@
 using MassTransit;
+using MassTransit.Audit;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Prometheus;
+using Restaraunt.Booking.Classes;
 using Restaraunt.Kitchen;
 using Restaraunt.Kitchen.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var serviceProvider = builder.Services.BuildServiceProvider();
+var auditStore = serviceProvider.GetService<IMessageAuditStore>();
+
+
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<KitchenBookingRequestedConsumer>(cfg =>
@@ -54,13 +63,18 @@ builder.Services.AddMassTransit(x =>
         cfg.UseDelayedMessageScheduler();
         cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
+        cfg.ConnectSendAuditObservers(auditStore);
+        cfg.ConnectConsumeAuditObserver(auditStore);
+        cfg.UsePrometheusMetrics(serviceName: "restaurant_kitchen");
     });
 });
 
-builder.Services.AddSingleton<Manager>();
+builder.Services
+    .AddSingleton<Manager>()
+    .AddSingleton<IMessageAuditStore, LoggingAuditStore>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
+app.MapMetrics();
 app.Run();
