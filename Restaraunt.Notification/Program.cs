@@ -1,14 +1,26 @@
 using MassTransit;
+using MassTransit.Audit;
+using Prometheus;
 using Restaraunt.Notification;
-using Restaurant.Notification.Consumers;
+using Restaraunt.Notification.Consumers;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+var serviceProvider = builder.Services.BuildServiceProvider();
+var auditStore = serviceProvider.GetService<IMessageAuditStore>();
+
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<NotifierTableBookedConsumer>();
-    x.AddConsumer<KitchenReadyConsumer>();
+    x.AddConsumer<NotifyConsumer>(cfg =>
+    {
+        cfg.UseMessageRetry(r => r.Incremental(3, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+        cfg.UseScheduledRedelivery(r => r.Incremental(3, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10)));
+    })
+        .Endpoint(e =>
+        {
+            e.Temporary = true;
+        });
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -33,11 +45,19 @@ builder.Services.AddMassTransit(x =>
             r.Ignore<ArgumentNullException>(x => x.Message.Contains("Consumer"));
         });
 
+        cfg.UseDelayedMessageScheduler();
+        cfg.UseInMemoryOutbox();
         cfg.ConfigureEndpoints(context);
+        cfg.ConnectSendAuditObservers(auditStore);
+        cfg.ConnectConsumeAuditObserver(auditStore);
+        cfg.UsePrometheusMetrics(serviceName: "restaurant_notification");
     });
 });
 
-builder.Services.AddSingleton<Notifier>();
+builder.Services
+    .AddSingleton<Notifier>();
 
 var app = builder.Build();
+
+app.MapMetrics();
 app.Run();

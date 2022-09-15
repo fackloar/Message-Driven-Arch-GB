@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Restaraunt.Booking.Classes
 {
-    internal enum State
+    public enum State
     {
         /// <summary>
         /// Стол свободен

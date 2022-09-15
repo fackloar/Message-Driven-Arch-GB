@@ -4,39 +4,16 @@ namespace Restaraunt.Notification
 {
     public class Notifier
     {
-        //импровизированный кэш для хранения статусов, номера заказа и клиента
-        private readonly ConcurrentDictionary<Guid, Tuple<Guid?, Accepted>> _state = new();
+        private readonly ILogger<Notifier> _logger;
 
-        public void Accept(Guid orderId, Accepted accepted, Guid? clientId = null)
+        public Notifier(ILogger<Notifier> logger)
         {
-            _state.AddOrUpdate(orderId, new Tuple<Guid?, Accepted>(clientId, accepted),
-                (guid, oldValue) => new Tuple<Guid?, Accepted>(
-                    oldValue.Item1 ?? clientId, oldValue.Item2 | accepted));
-
-            Notify(orderId);
+            _logger = logger;
         }
 
-        private void Notify(Guid orderId)
+        public void Notify(Guid orderId, Guid clientId, string message)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            var booking = _state[orderId];
-
-            switch (booking.Item2)
-            {
-                case Accepted.All:
-                    Console.WriteLine($"Успешно забронировано для клиента {booking.Item1}");
-                    _state.Remove(orderId, out _);
-                    break;
-                case Accepted.Rejected:
-                    Console.WriteLine($"Гость {booking.Item1}, к сожалению, все столики заняты");
-                    _state.Remove(orderId, out _);
-                    break;
-                case Accepted.Kitchen:
-                case Accepted.Booking:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            _logger.LogInformation($"[OrderID: {orderId}] Уважаемый клиент {clientId}! {message}");
         }
     }
 }
